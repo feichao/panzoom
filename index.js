@@ -694,10 +694,44 @@ function createPanZoom(domElement, options) {
     return {x: offsetX, y: offsetY};
   }
 
+  function getMobileOperatingSystem() {
+      var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+      // Windows Phone must come first because its UA also contains "Android"
+      if (/windows phone/i.test(userAgent)) {
+          return 'Windows Phone';
+      }
+
+      if (/android/i.test(userAgent)) {
+          return 'Android';
+      }
+
+      // iOS detection from: http://stackoverflow.com/a/9039885/177710
+      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+          return 'iOS';
+      }
+
+      return 'unknown';
+  }
+
   function smoothZoom(clientX, clientY, scaleMultiplier) {
       var fromValue = transform.scale
-      var from = {scale: fromValue}
-      var to = {scale: scaleMultiplier * fromValue}
+      var from = { scale: fromValue }
+      var to = { scale: minZoom }
+
+      var system = getMobileOperatingSystem();
+
+      if (system === 'iOS') {
+        to = { scale: minZoom }
+      } else {
+        to = { scale: maxZoom }
+      }
+
+      if (Math.abs(fromValue - maxZoom) <= 0.01) {
+        to.scale = minZoom;
+      } else if (Math.abs(fromValue - minZoom) <= 0.01) {
+        to.scale = maxZoom;
+      }
 
       smoothScroll.cancel()
       cancelZoomAnimation()

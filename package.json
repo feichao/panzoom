@@ -1,11 +1,13 @@
 {
   "name": "panzoom",
-  "version": "6.1.4",
+  "version": "6.1.5",
   "description": "Extensible, mobile friendly pan and zoom framework (supports DOM and SVG).",
   "main": "index.js",
   "scripts": {
     "test": "tap test/*.js",
-    "build": "browserify -s panzoom ./index.js > dist/panzoom.js && uglifyjs dist/panzoom.js > dist/panzoom.min.js"
+    "_pack": "browserify -s panzoom ./index.js > dist/panzoom.js",
+    "_dist": "uglifyjs dist/panzoom.js > dist/panzoom.min.js",
+    "build": "npm run _pack && npm run _dist"
   },
   "keywords": [
     "dom",
@@ -24,7 +26,9 @@
     "wheel": "0.0.5"
   },
   "devDependencies": {
+    "browserify": "^16.2.3",
     "jsdom": "^11.12.0",
-    "tap": "^12.0.0"
+    "tap": "^12.0.0",
+    "uglify-js": "^3.4.9"
   }
 }
