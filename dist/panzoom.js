@@ -14,6 +14,7 @@ var makeDomController = require('./lib/domController.js')
 
 var defaultZoomSpeed = 0.065
 var defaultDoubleTapZoomSpeed = 1.75
+var isMouseMove = false
 var doubleTapSpeedInMS = 300
 var doubleTapTimer = null
 
@@ -526,6 +527,7 @@ function createPanZoom(domElement, options) {
   }
 
   function handleTouchMove(e) {
+    isMouseMove = true
     if (e.touches.length === 1) {
       e.stopPropagation()
       var touch = e.touches[0]
@@ -582,9 +584,12 @@ function createPanZoom(domElement, options) {
       mouseY = offset.y
     } else {
       clearTimeout(doubleTapTimer)
-      doubleTapTimer = setTimeout(function() {
-        triggerEvent('tap')
-      }, doubleTapSpeedInMS + 30)
+      if (!isMouseMove) {
+        doubleTapTimer = setTimeout(function() {
+          triggerEvent('tap')
+        }, doubleTapSpeedInMS + 30)
+      }
+     
 
       var now = new Date()
       if (now - lastTouchEndTime < doubleTapSpeedInMS) {
@@ -599,6 +604,7 @@ function createPanZoom(domElement, options) {
       triggerPanEnd()
       releaseTouches()
     }
+    isMouseMove = false
   }
 
   function getPinchZoomLength(finger1, finger2) {
