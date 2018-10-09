@@ -14,6 +14,7 @@ var makeDomController = require('./lib/domController.js')
 var defaultZoomSpeed = 0.065
 var defaultDoubleTapZoomSpeed = 1.75
 var doubleTapSpeedInMS = 300
+var doubleTapTimer = null
 
 module.exports = createPanZoom
 
@@ -579,9 +580,16 @@ function createPanZoom(domElement, options) {
       mouseX = offset.x
       mouseY = offset.y
     } else {
+      clearTimeout(doubleTapTimer)
+      doubleTapTimer = setTimeout(function() {
+        triggerEvent('tap')
+      }, doubleTapSpeedInMS + 30)
+
       var now = new Date()
       if (now - lastTouchEndTime < doubleTapSpeedInMS) {
         smoothZoom(mouseX, mouseY, zoomDoubleClickSpeed)
+        clearTimeout(doubleTapTimer)
+        triggerEvent('doubletap')
       }
 
       lastTouchEndTime = now
