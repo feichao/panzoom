@@ -526,7 +526,6 @@ function createPanZoom(domElement, options) {
   }
 
   function handleTouchMove(e) {
-    isMouseMove = true
     if (e.touches.length === 1) {
       e.stopPropagation()
       var touch = e.touches[0]
@@ -539,11 +538,16 @@ function createPanZoom(domElement, options) {
       if (dx !== 0 && dy !== 0) {
         triggerPanStart()
       }
+
+      if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+        isMouseMove = true
+      }
       mouseX = offset.x
       mouseY = offset.y
       var point = transformToScreen(dx, dy)
       internalMoveBy(point.x, point.y)
     } else if (e.touches.length === 2) {
+      isMouseMove = true
       // it's a zoom, let's find direction
       multitouch = true
       var t1 = e.touches[0]
@@ -577,7 +581,7 @@ function createPanZoom(domElement, options) {
   }
 
   function handleTouchEnd(e) {
-    if (e.touches.length > 0) {
+    if (e.changedTouches.length > 1) {
       var offset = getOffsetXY(e.touches[0])
       mouseX = offset.x
       mouseY = offset.y
@@ -588,7 +592,6 @@ function createPanZoom(domElement, options) {
           triggerEvent('tap')
         }, doubleTapSpeedInMS + 30)
       }
-     
 
       var now = new Date()
       if (now - lastTouchEndTime < doubleTapSpeedInMS) {
